@@ -75,8 +75,21 @@ export async function runAttackerCycles(cycles = CYCLES): Promise<Array<{ postId
 
 // Run as standalone if called directly
 if (require.main === module) {
-  runAttackerCycles().then(() => process.exit(0)).catch(err => {
-    logger.error('Fatal', { err });
-    process.exit(1);
-  });
+  if (process.env.ENABLE_ATTACKER === 'true') {
+    logger.warn('=== ATTACKER AGENT RUNNING IN LOOP MODE ===');
+    const postInterval = parseInt(process.env.ATTACKER_INTERVAL_MS || '30000');
+    
+    // Post immediately
+    postFakeContent(0).catch(err => logger.error('First post failed', { err }));
+    
+    let cycle = 1;
+    setInterval(() => {
+      postFakeContent(cycle++).catch(err => logger.error('Post failed', { err }));
+    }, postInterval);
+  } else {
+    runAttackerCycles().then(() => process.exit(0)).catch(err => {
+      logger.error('Fatal', { err });
+      process.exit(1);
+    });
+  }
 }

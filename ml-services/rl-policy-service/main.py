@@ -93,14 +93,9 @@ def predict(req: PolicyRequest):
     except (FileNotFoundError, RuntimeError) as e:
         logger.warning(f"RL model or stable-baselines3 not available, using rule-based fallback: {e}")
         # Rule-based fallback (highly active simulation for dashboard presentation)
-        if req.forecast > req.price:
-            action = 1 # BUY
-        elif req.forecast < req.price:
-            action = 2 # SELL
-        else:
-            # Fallback to random choice of BUY/SELL to guarantee high activity
-            import random
-            action = random.choice([1, 2])
+        # Random choice of HOLD (0), BUY (1), and SELL (2) in equal proportions
+        import random
+        action = random.choice([0, 1, 2])
         confidence = 0.75
 
     latency_ms = int((time.time() - start) * 1000)

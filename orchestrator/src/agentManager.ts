@@ -113,7 +113,7 @@ export const agentManager = {
 
   startAll(): void {
     for (const name of Object.keys(AGENT_SCRIPTS)) {
-      if (name === 'attacker-agent') continue;
+      if (name === 'attacker-agent' && process.env.ENABLE_ATTACKER !== 'true') continue;
       try {
         this.start(name);
       } catch (err) {
